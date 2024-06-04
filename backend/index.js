@@ -5,6 +5,9 @@ const express = require('express')
 const app = express()
 const port = 3000
 
+// To view the request on body
+app.use(express.json());
+
 // Available Routes
 app.use("/api/auth", require("./routes/auth"));
 app.use("/api/notes", require("./routes/notes"));

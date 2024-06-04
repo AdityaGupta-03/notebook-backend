@@ -9,6 +9,8 @@ const noteSchema = new mongoose.Schema({
 });
 
 // Create the Note model
-const Note = mongoose.model('Note', noteSchema);
+const Notes = mongoose.model('Note', noteSchema);
+Notes.createIndexes();
+module.exports = Notes
 
 // Using these models inside routes to interact with DB
