@@ -3,7 +3,6 @@ mongoDB();
 
 const express = require('express')
 const app = express()
-const port = 3000
 
 // To view the request on body
 app.use(express.json());
@@ -13,7 +12,9 @@ app.use("/api/auth", require("./routes/auth"));
 app.use("/api/notes", require("./routes/notes"));
 
 
-// on Port No. 3000, Nodejs server should run and from there request is handled and response is thrown
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
+// nodemon server runs the index.js files(node.js) on 3000 Port and give the required response based upon request
+// On Port 3000: React app will run
+// On Port 5000: nodemon server will run which will handle the requests
+app.listen(5000, () => {
+  console.log(`Example app listening on port 5000`)
 })
