@@ -1,10 +1,7 @@
-const mongoDB = require("./db");
-mongoDB();
-
 const express = require('express')
 const router = express.Router();
 
-router.get('/api/notes', (req, res) => {
+router.get('/', (req, res) => {
     obj={
         title: "Headache",
         description: "Go to bed",

@@ -10,3 +10,5 @@ const userSchema = new mongoose.Schema({
 
 // Create the Note model
 const Note = mongoose.model('User', userSchema);
+
+// Using these models inside routes to interact with DB
