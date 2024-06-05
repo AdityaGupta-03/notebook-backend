@@ -8,6 +8,10 @@ const { body, query, validationResult } = require('express-validator');
 
 // TO make hash of the Password
 const bcrypt = require('bcryptjs');
+
+// Json Web Tokento return the token when user gets created
+var jwt = require('jsonwebtoken');
+
 // Creating user using: POST endpoint "/api/auth/createUser" : No Login required
 router.post('/createUser',
     body('name', "Enter a valid Name").notEmpty(),
@@ -36,7 +40,16 @@ router.post('/createUser',
                 email: req.body.email,
                 password: hash
             });
-            res.json(user);
+
+            let data={
+                user:{
+                    id: user._id
+                }
+            }
+            let JWT_KEY = "edghWQIRUSjisfe";
+            var token = jwt.sign(data, JWT_KEY);
+
+            res.json(token);
         } catch (err) {
             console.error(err.message);
             res.send(500).send("Some Error has been occurred");
