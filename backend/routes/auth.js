@@ -12,7 +12,7 @@ const bcrypt = require('bcryptjs');
 // Json Web Tokento return the token when user gets created
 var jwt = require('jsonwebtoken');
 
-// Creating user using: POST endpoint "/api/auth/createUser" : No Login required
+// Route1: Creating user using: POST endpoint "/api/auth/createUser" : No Login required
 router.post('/createUser',
     body('name', "Enter a valid Name").notEmpty(),
     body('email', "Enter a valid Email").isEmail(),
@@ -58,7 +58,7 @@ router.post('/createUser',
 );
 
 
-// Creating user using: POST endpoint "/api/auth/login" 
+// Route 2: Checking User Credentials: POST endpoint "/api/auth/login" 
 router.post('/login',
     body('email', "Enter a valid Email").isEmail(),
     body('password').notEmpty(),
@@ -97,5 +97,26 @@ router.post('/login',
         }
     }
 );
+
+// Route 3: Showing details of signedin User: POST endpoint "/api/auth/getUser" 
+router.post('/getUser', middleware, async (req, res) => {
+    // Check for validation errors
+    const result = validationResult(req);
+    if (!result.isEmpty()) {
+        return res.status(400).json({ result: result.array() });
+    }
+
+    // Checking if user has filled correct login credentials
+    try {
+        let userId = "TODO";
+        let user = await User.findById(userId).select("-password");
+        if (!user) {
+            return res.status(400).json({ error: "Kindly Login" });
+        }
+    } catch (err) {
+        console.error(err.message);
+        res.send(500).send("Some Error has been occurred");
+    }
+});
 
 module.exports = router;
