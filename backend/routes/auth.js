@@ -12,6 +12,9 @@ const bcrypt = require('bcryptjs');
 // Json Web Tokento return the token when user gets created
 var jwt = require('jsonwebtoken');
 
+// Fetching the user data by verifying the JSON Token
+const fetchUser = require("../middleware/fetchUser");
+
 // Route1: Creating user using: POST endpoint "/api/auth/createUser" : No Login required
 router.post('/createUser',
     body('name', "Enter a valid Name").notEmpty(),
@@ -46,13 +49,13 @@ router.post('/createUser',
                     id: user._id
                 }
             }
-            let JWT_KEY = "edghWQIRUSjisfe";
-            let token = jwt.sign(data, JWT_KEY);
+
+            let token = jwt.sign(data, process.env.JWT_SECRET);
 
             res.json({token});
         } catch (err) {
             console.error(err.message);
-            res.send(500).send("Some Error has been occurred");
+            res.status(500).send("Some Error has been occurred");
         }
     }
 );
@@ -76,7 +79,7 @@ router.post('/login',
             if (!user) {
                 return res.status(400).json({ error: "Please try with correct login credentials" });
             }
-           
+
             let pwdCompare = await bcrypt.compare(req.body.password, user.password);
             if(!pwdCompare){
                 return res.status(400).json({ error: "Please try with correct login credentials" });
@@ -87,19 +90,19 @@ router.post('/login',
                     id: user._id
                 }
             }
-            let JWT_KEY = "edghWQIRUSjisfe";
-            let token = jwt.sign(payload, JWT_KEY);
+
+            let token = jwt.sign(payload, process.env.JWT_SECRET);
 
             res.json({token});
         } catch (err) {
             console.error(err.message);
-            res.send(500).send("Some Error has been occurred");
+            res.status(500).send("Some Error has been occurred");
         }
     }
 );
 
 // Route 3: Showing details of signedin User: POST endpoint "/api/auth/getUser" 
-router.post('/getUser', middleware, async (req, res) => {
+router.post('/getUser', fetchUser, async (req, res) => {
     // Check for validation errors
     const result = validationResult(req);
     if (!result.isEmpty()) {
@@ -108,11 +111,12 @@ router.post('/getUser', middleware, async (req, res) => {
 
     // Checking if user has filled correct login credentials
     try {
-        let userId = "TODO";
+        let userId = req.user.id;
         let user = await User.findById(userId).select("-password");
         if (!user) {
             return res.status(400).json({ error: "Kindly Login" });
         }
+        res.send(user);
     } catch (err) {
         console.error(err.message);
         res.send(500).send("Some Error has been occurred");
