@@ -112,8 +112,7 @@ router.post('/getUser', fetchUser, async (req, res) => {
 
     // Checking if user has filled correct login credentials
     try {
-        let userId = req.user.id;
-        console.log(req.user.id);
+        let userId = req.user.user.id;
         let user = await User.findById(userId).select("-password");
         if (!user) {
             return res.status(400).json({ error: "Kindly Login" });
