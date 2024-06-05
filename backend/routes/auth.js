@@ -47,14 +47,55 @@ router.post('/createUser',
                 }
             }
             let JWT_KEY = "edghWQIRUSjisfe";
-            var token = jwt.sign(data, JWT_KEY);
+            let token = jwt.sign(data, JWT_KEY);
 
-            res.json(token);
+            res.json({token});
         } catch (err) {
             console.error(err.message);
             res.send(500).send("Some Error has been occurred");
         }
+    }
+);
 
-    });
+
+// Creating user using: POST endpoint "/api/auth/login" 
+router.post('/login',
+    body('email', "Enter a valid Email").isEmail(),
+    body('password').notEmpty(),
+    async (req, res) => {
+        // Check for validation errors
+        const result = validationResult(req);
+        if (!result.isEmpty()) {
+            return res.status(400).json({ result: result.array() });
+        }
+
+        // Checking if user has filled correct login credentials
+        try {
+            // Check whether user email exists already or not
+            let user = await User.findOne({email: req.body.email});
+            if (!user) {
+                return res.status(400).json({ error: "Please try with correct login credentials" });
+            }
+           
+            let pwdCompare = await bcrypt.compare(req.body.password, user.password);
+            if(!pwdCompare){
+                return res.status(400).json({ error: "Please try with correct login credentials" });
+            }
+
+            const payload={
+                user:{
+                    id: user._id
+                }
+            }
+            let JWT_KEY = "edghWQIRUSjisfe";
+            let token = jwt.sign(payload, JWT_KEY);
+
+            res.json({token});
+        } catch (err) {
+            console.error(err.message);
+            res.send(500).send("Some Error has been occurred");
+        }
+    }
+);
 
 module.exports = router;
