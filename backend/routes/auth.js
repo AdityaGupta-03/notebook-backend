@@ -15,6 +15,7 @@ var jwt = require('jsonwebtoken');
 // Fetching the user data by verifying the JSON Token
 const fetchUser = require("../middleware/fetchUser");
 
+
 // Route1: Creating user using: POST endpoint "/api/auth/createUser" : No Login required
 router.post('/createUser',
     body('name', "Enter a valid Name").notEmpty(),
@@ -112,6 +113,7 @@ router.post('/getUser', fetchUser, async (req, res) => {
     // Checking if user has filled correct login credentials
     try {
         let userId = req.user.id;
+        console.log(req.user.id);
         let user = await User.findById(userId).select("-password");
         if (!user) {
             return res.status(400).json({ error: "Kindly Login" });
