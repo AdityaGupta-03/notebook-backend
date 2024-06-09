@@ -6,7 +6,7 @@ const express = require('express');
 const router = express.Router();
 const { body, query, validationResult } = require('express-validator');
 
-// TO make hash of the Password
+// T0 make hash of the Password
 const bcrypt = require('bcryptjs');
 
 // Json Web Tokento return the token when user gets created
@@ -16,7 +16,7 @@ var jwt = require('jsonwebtoken');
 const fetchUser = require("../middleware/fetchUser");
 
 
-// Route 1: Creating user using POST: endpoint "/api/auth/createUser" : No Login required
+//^ Route 1: Creating user using POST: endpoint "/api/auth/createUser" : No Login required
 router.post('/createUser',
     [   body('name', "Enter a valid Name").notEmpty(),
         body('email', "Enter a valid Email").isEmail(),
@@ -59,8 +59,7 @@ router.post('/createUser',
     }
 );
 
-
-// Route 2: Checking User Credentials: POST endpoint "/api/auth/login" 
+//^ Route 2: Checking User Credentials: POST endpoint "/api/auth/login" 
 router.post('/login',
     [
         body('email', "Enter a valid Email").isEmail(),
@@ -100,7 +99,7 @@ router.post('/login',
     }
 );
 
-// Route 3: Showing details of signedin User: POST endpoint "/api/auth/getUser" : Login Required
+//^ Route 3: Showing details of signedin User: POST endpoint "/api/auth/getUser" : Login Required
 router.post('/getUser', fetchUser, async (req, res) => {
     // Check for validation errors
     const result = validationResult(req);
@@ -115,7 +114,7 @@ router.post('/getUser', fetchUser, async (req, res) => {
         if (!user) {
             return res.status(400).json({ error: "Kindly Login" });
         }
-        
+
         res.send(user);
 
     } catch (err) {

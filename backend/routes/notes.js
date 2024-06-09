@@ -12,8 +12,12 @@ var jwt = require('jsonwebtoken');
 // Fetching the user data by verifying the JSON Token
 const fetchUser = require("../middleware/fetchUser");
 
-// Route 1: Get All Notes: GET endpoint "/api/notes/FetchNotes" : For loggedin User only
-router.post('/fetchNotes', fetchUser,
+//^ Route 1: Fetching All Notes: GET endpoint "/api/notes/FetchNotes" : For loggedin User only
+router.post('/fetchNotes',
+    [
+        body('email', "Enter a valid Email").isEmail(),
+        body('password').notEmpty()
+    ],
     async (req, res) => {
         // Check for validation errors
         const result = validationResult(req);
@@ -21,34 +25,149 @@ router.post('/fetchNotes', fetchUser,
             return res.status(400).json({ result: result.array() });
         }
 
-        // Create a new user record from the parameters of request.body
+        // Checking if user has filled correct login credentials
         try {
             // Check whether user email exists already or not
-            let user = await User.findOne({ email: req.body.email });
-            if (user) {
-                return res.status(400).json({ error: "User with this email already exist" });
-            }
-            var salt = bcrypt.genSaltSync(10);
-            var hash = await bcrypt.hashSync(req.body.password, salt);
-
-            user = await User.create({
-                name: req.body.name,
-                email: req.body.email,
-                password: hash
-            });
-
-            let data = {
-                user: {
-                    id: user._id
-                }
+            let user = await Users.findOne({ email: req.body.email });
+            if (!user) {
+                return res.status(400).json({ error: "Please try with correct login credentials" });
             }
 
-            let token = jwt.sign(data, process.env.JWT_SECRET);
+            let pwdCompare = await bcrypt.compare(req.body.password, user.password);
+            if (!pwdCompare) {
+                return res.status(400).json({ error: "Please try with correct login credentials" });
+            }
 
+            const payload = {
+                id: user._id
+            }
+
+            let token = jwt.sign(payload, process.env.JWT_SECRET);
             res.json({ token });
+
         } catch (err) {
             console.error(err.message);
-            res.status(500).send("Some Error has been occurred");
+            res.status(500).send("Error while login request");
+        }
+    }
+);
+
+//^ Route 2: Submitting Note: POST endpoint "/api/notes/newNote" : For loggedin User only
+router.post('/newNote',
+    [
+        body('email', "Enter a valid Email").isEmail(),
+        body('password').notEmpty()
+    ],
+    async (req, res) => {
+        // Check for validation errors
+        const result = validationResult(req);
+        if (!result.isEmpty()) {
+            return res.status(400).json({ result: result.array() });
+        }
+
+        // Checking if user has filled correct login credentials
+        try {
+            // Check whether user email exists already or not
+            let user = await Users.findOne({ email: req.body.email });
+            if (!user) {
+                return res.status(400).json({ error: "Please try with correct login credentials" });
+            }
+
+            let pwdCompare = await bcrypt.compare(req.body.password, user.password);
+            if (!pwdCompare) {
+                return res.status(400).json({ error: "Please try with correct login credentials" });
+            }
+
+            const payload = {
+                id: user._id
+            }
+
+            let token = jwt.sign(payload, process.env.JWT_SECRET);
+            res.json({ token });
+
+        } catch (err) {
+            console.error(err.message);
+            res.status(500).send("Error while login request");
+        }
+    }
+);
+
+//^ Route 3: Updating Notes: POST endpoint "/api/notes/updateNote" : For loggedin User only
+router.post('/updateNote',
+    [
+        body('email', "Enter a valid Email").isEmail(),
+        body('password').notEmpty()
+    ],
+    async (req, res) => {
+        // Check for validation errors
+        const result = validationResult(req);
+        if (!result.isEmpty()) {
+            return res.status(400).json({ result: result.array() });
+        }
+
+        // Checking if user has filled correct login credentials
+        try {
+            // Check whether user email exists already or not
+            let user = await Users.findOne({ email: req.body.email });
+            if (!user) {
+                return res.status(400).json({ error: "Please try with correct login credentials" });
+            }
+
+            let pwdCompare = await bcrypt.compare(req.body.password, user.password);
+            if (!pwdCompare) {
+                return res.status(400).json({ error: "Please try with correct login credentials" });
+            }
+
+            const payload = {
+                id: user._id
+            }
+
+            let token = jwt.sign(payload, process.env.JWT_SECRET);
+            res.json({ token });
+
+        } catch (err) {
+            console.error(err.message);
+            res.status(500).send("Error while login request");
+        }
+    }
+);
+
+//^ Route 4: Deleting Notes: POST endpoint "/api/notes/deleteNote" : For loggedin User only
+router.post('/deleteNote',
+    [
+        body('email', "Enter a valid Email").isEmail(),
+        body('password').notEmpty()
+    ],
+    async (req, res) => {
+        // Check for validation errors
+        const result = validationResult(req);
+        if (!result.isEmpty()) {
+            return res.status(400).json({ result: result.array() });
+        }
+
+        // Checking if user has filled correct login credentials
+        try {
+            // Check whether user email exists already or not
+            let user = await Users.findOne({ email: req.body.email });
+            if (!user) {
+                return res.status(400).json({ error: "Please try with correct login credentials" });
+            }
+
+            let pwdCompare = await bcrypt.compare(req.body.password, user.password);
+            if (!pwdCompare) {
+                return res.status(400).json({ error: "Please try with correct login credentials" });
+            }
+
+            const payload = {
+                id: user._id
+            }
+
+            let token = jwt.sign(payload, process.env.JWT_SECRET);
+            res.json({ token });
+
+        } catch (err) {
+            console.error(err.message);
+            res.status(500).send("Error while login request");
         }
     }
 );
