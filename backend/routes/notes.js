@@ -25,7 +25,7 @@ router.get('/fetchNotes', fetchUser,
 
         } catch (err) {
             console.error(err.message);
-            res.status(500).send("Error while Fetching Note request");
+            res.status(500).send("Internal Server Error");
         }
     }
 );
@@ -52,7 +52,7 @@ router.post('/newNote', fetchUser,
 
         } catch (err) {
             console.error(err.message);
-            res.status(500).send("Error while Creating Note request");
+            res.status(500).send("Internal Server Error");
         }
     }
 );
@@ -92,7 +92,7 @@ router.put('/updateNote/:id', fetchUser,
 
         } catch (err) {
             console.error(err.message);
-            res.status(500).send("Error while updating the note request");
+            res.status(500).send("Internal Server Error");
         }
     }
 );
@@ -116,7 +116,7 @@ router.delete('/deleteNote/:id', fetchUser,
 
         } catch (err) {
             console.error(err.message);
-            res.status(500).send("Error while Deleting the note request");
+            res.status(500).send("Internal Server Error");
         }
     }
 );
