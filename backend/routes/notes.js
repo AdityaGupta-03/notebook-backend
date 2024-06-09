@@ -13,41 +13,19 @@ var jwt = require('jsonwebtoken');
 const fetchUser = require("../middleware/fetchUser");
 
 //^ Route 1: Fetching All Notes: GET endpoint "/api/notes/FetchNotes" : For loggedin User only
-router.post('/fetchNotes',
-    [
-        body('email', "Enter a valid Email").isEmail(),
-        body('password').notEmpty()
-    ],
+router.post('/fetchNotes', fetchUser,
     async (req, res) => {
-        // Check for validation errors
-        const result = validationResult(req);
-        if (!result.isEmpty()) {
-            return res.status(400).json({ result: result.array() });
-        }
-
-        // Checking if user has filled correct login credentials
         try {
-            // Check whether user email exists already or not
-            let user = await Users.findOne({ email: req.body.email });
-            if (!user) {
-                return res.status(400).json({ error: "Please try with correct login credentials" });
+            let note = await Notes.find({ user: req.user.id });
+            if (!note) {
+                return res.status(400).json({ error: "Notes are not present with the mentioned User" });
             }
 
-            let pwdCompare = await bcrypt.compare(req.body.password, user.password);
-            if (!pwdCompare) {
-                return res.status(400).json({ error: "Please try with correct login credentials" });
-            }
-
-            const payload = {
-                id: user._id
-            }
-
-            let token = jwt.sign(payload, process.env.JWT_SECRET);
-            res.json({ token });
+            res.json(note);
 
         } catch (err) {
             console.error(err.message);
-            res.status(500).send("Error while login request");
+            res.status(500).send("Error while Fetching Note request");
         }
     }
 );
@@ -55,39 +33,26 @@ router.post('/fetchNotes',
 //^ Route 2: Submitting Note: POST endpoint "/api/notes/newNote" : For loggedin User only
 router.post('/newNote',
     [
-        body('email', "Enter a valid Email").isEmail(),
-        body('password').notEmpty()
+        // Validators in express-validator
+        body('title', "Enter title").isLength({ min: 3 }),
+        body('description', "Enter Description").notEmpty(),
+        body('tag',"Enter tag").notEmpty()
     ],
     async (req, res) => {
-        // Check for validation errors
-        const result = validationResult(req);
-        if (!result.isEmpty()) {
-            return res.status(400).json({ result: result.array() });
-        }
-
-        // Checking if user has filled correct login credentials
         try {
-            // Check whether user email exists already or not
-            let user = await Users.findOne({ email: req.body.email });
-            if (!user) {
-                return res.status(400).json({ error: "Please try with correct login credentials" });
-            }
+            const note = await new Notes({
+                title: req.body.title,
+                description: req.body.description,
+                tag: req.body.tag,
+                user: req.user.id
+            });
 
-            let pwdCompare = await bcrypt.compare(req.body.password, user.password);
-            if (!pwdCompare) {
-                return res.status(400).json({ error: "Please try with correct login credentials" });
-            }
-
-            const payload = {
-                id: user._id
-            }
-
-            let token = jwt.sign(payload, process.env.JWT_SECRET);
-            res.json({ token });
-
+            const savedNote = await note.save();
+            res.json(savedNote);
+            
         } catch (err) {
             console.error(err.message);
-            res.status(500).send("Error while login request");
+            res.status(500).send("Error while Creating Note request");
         }
     }
 );
