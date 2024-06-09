@@ -97,14 +97,26 @@ router.put('/updateNote/:id', fetchUser,
     }
 );
 
-//^ Route 4: Deleting Notes: POST endpoint "/api/notes/deleteNote" : For loggedin User only
-router.post('/deleteNote',
+//^ Route 4: Deleting Notes: POST endpoint "/api/notes/deleteNote/NoteID (params)" : For loggedin User only
+router.delete('/deleteNote/:id', fetchUser,
     async (req, res) => {
         try {
+            const note = await Notes.findById(req.params.id);
+            if (!note) {
+                return res.status(404).send("Not Found");
+            }
+            if(note.user.toString() !== req.user.id){
+                return res.status(401).send("Not Allowed");
+            }
+            const deletedNote = await Notes.findOneAndDelete({ _id: req.params.id, user: req.user.id });
+            if (!deletedNote) {
+                return res.status(400).json({ error: "Unable to delete the note" });
+            }
+            res.json(deletedNote);
 
         } catch (err) {
             console.error(err.message);
-            res.status(500).send("Error while login request");
+            res.status(500).send("Error while Deleting the note request");
         }
     }
 );
