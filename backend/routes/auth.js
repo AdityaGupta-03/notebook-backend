@@ -1,5 +1,5 @@
 // Using the user model into the Routes
-const User = require("../models/User");
+const Users = require("../models/Users.js");
 
 // Using express to handle the requests to server and send the response to the Client
 const express = require('express');
@@ -16,11 +16,12 @@ var jwt = require('jsonwebtoken');
 const fetchUser = require("../middleware/fetchUser");
 
 
-// Route1: Creating user using: POST endpoint "/api/auth/createUser" : No Login required
+// Route 1: Creating user using POST: endpoint "/api/auth/createUser" : No Login required
 router.post('/createUser',
-    body('name', "Enter a valid Name").notEmpty(),
-    body('email', "Enter a valid Email").isEmail(),
-    body('password').isLength({ min: 5 }),
+    [   body('name', "Enter a valid Name").notEmpty(),
+        body('email', "Enter a valid Email").isEmail(),
+        body('password').isLength({ min: 5 })
+    ],
     async (req, res) => {
         // Check for validation errors
         const result = validationResult(req);
@@ -32,28 +33,28 @@ router.post('/createUser',
 
         try {
             // Check whether user email exists already or not
-            let user = await User.findOne({ email: req.body.email });
+            let user = await Users.findOne({ email: req.body.email });
             if (user) {
                 return res.status(400).json({ error: "User with this email already exist" });
             }
             var salt = bcrypt.genSaltSync(10);
             var hash = await bcrypt.hashSync(req.body.password, salt);
 
-            user = await User.create({
+            user = await Users.create({
                 name: req.body.name,
                 email: req.body.email,
                 password: hash
             });
 
-            let data={
-                user:{
+            let data = {
+                user: {
                     id: user._id
                 }
             }
 
             let token = jwt.sign(data, process.env.JWT_SECRET);
 
-            res.json({token});
+            res.json({ token });
         } catch (err) {
             console.error(err.message);
             res.status(500).send("Some Error has been occurred");
@@ -76,25 +77,25 @@ router.post('/login',
         // Checking if user has filled correct login credentials
         try {
             // Check whether user email exists already or not
-            let user = await User.findOne({email: req.body.email});
+            let user = await User.findOne({ email: req.body.email });
             if (!user) {
                 return res.status(400).json({ error: "Please try with correct login credentials" });
             }
 
             let pwdCompare = await bcrypt.compare(req.body.password, user.password);
-            if(!pwdCompare){
+            if (!pwdCompare) {
                 return res.status(400).json({ error: "Please try with correct login credentials" });
             }
 
-            const payload={
-                user:{
+            const payload = {
+                user: {
                     id: user._id
                 }
             }
 
             let token = jwt.sign(payload, process.env.JWT_SECRET);
 
-            res.json({token});
+            res.json({ token });
         } catch (err) {
             console.error(err.message);
             res.status(500).send("Some Error has been occurred");
@@ -102,7 +103,7 @@ router.post('/login',
     }
 );
 
-// Route 3: Showing details of signedin User: POST endpoint "/api/auth/getUser" 
+// Route 3: Showing details of signedin User: POST endpoint "/api/auth/getUser" : Login Required
 router.post('/getUser', fetchUser, async (req, res) => {
     // Check for validation errors
     const result = validationResult(req);

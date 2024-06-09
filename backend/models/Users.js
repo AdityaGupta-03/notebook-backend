@@ -1,5 +1,4 @@
 // Using these models inside routes to interact with DB
-
 const mongoose = require("mongoose");
 
 // Define the User schema
@@ -10,8 +9,8 @@ const userSchema = new mongoose.Schema({
   date: { type: Date, default: Date.now }
 });
 
-// Create the Note model
-const User = mongoose.model('User', userSchema);
+// Create the users model
+const User = mongoose.model('users', userSchema);
 
 // Create Index means creating primary key from the given keys if you make it unique
 // Notes.createIndexes();
