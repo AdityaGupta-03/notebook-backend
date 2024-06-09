@@ -30,7 +30,6 @@ router.post('/createUser',
         }
 
         // Create a new user record from the parameters of request.body
-
         try {
             // Check whether user email exists already or not
             let user = await Users.findOne({ email: req.body.email });
@@ -47,17 +46,15 @@ router.post('/createUser',
             });
 
             let data = {
-                user: {
-                    id: user._id
-                }
+                id: user._id
             }
 
             let token = jwt.sign(data, process.env.JWT_SECRET);
-
             res.json({ token });
+
         } catch (err) {
             console.error(err.message);
-            res.status(500).send("Some Error has been occurred");
+            res.status(500).send("Error while CreateUser Request");
         }
     }
 );
@@ -65,8 +62,10 @@ router.post('/createUser',
 
 // Route 2: Checking User Credentials: POST endpoint "/api/auth/login" 
 router.post('/login',
-    body('email', "Enter a valid Email").isEmail(),
-    body('password').notEmpty(),
+    [
+        body('email', "Enter a valid Email").isEmail(),
+        body('password').notEmpty()
+    ],
     async (req, res) => {
         // Check for validation errors
         const result = validationResult(req);
@@ -77,7 +76,7 @@ router.post('/login',
         // Checking if user has filled correct login credentials
         try {
             // Check whether user email exists already or not
-            let user = await User.findOne({ email: req.body.email });
+            let user = await Users.findOne({ email: req.body.email });
             if (!user) {
                 return res.status(400).json({ error: "Please try with correct login credentials" });
             }
@@ -88,17 +87,15 @@ router.post('/login',
             }
 
             const payload = {
-                user: {
-                    id: user._id
-                }
+                id: user._id
             }
 
             let token = jwt.sign(payload, process.env.JWT_SECRET);
-
             res.json({ token });
+
         } catch (err) {
             console.error(err.message);
-            res.status(500).send("Some Error has been occurred");
+            res.status(500).send("Error while login request");
         }
     }
 );
@@ -113,12 +110,14 @@ router.post('/getUser', fetchUser, async (req, res) => {
 
     // Checking if user has filled correct login credentials
     try {
-        let userId = req.user.user.id;
-        let user = await User.findById(userId).select("-password");
+        let userId = req.user.id;
+        let user = await Users.findById(userId).select("-password");
         if (!user) {
             return res.status(400).json({ error: "Kindly Login" });
         }
+        
         res.send(user);
+
     } catch (err) {
         console.error(err.message);
         res.send(500).send("Some Error has been occurred");
