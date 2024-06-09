@@ -57,7 +57,7 @@ router.post('/newNote', fetchUser,
     }
 );
 
-//^ Route 3: Updating Notes: PUT endpoint "/api/notes/updateNote/NoteID (params)" : For loggedin User only
+//^ Route 3: Updating an existing Note: PUT endpoint "/api/notes/updateNote/NoteID (params)" : For loggedin User only
 router.put('/updateNote/:id', fetchUser,
     async (req, res) => {
         try {
@@ -97,7 +97,7 @@ router.put('/updateNote/:id', fetchUser,
     }
 );
 
-//^ Route 4: Deleting Notes: POST endpoint "/api/notes/deleteNote/NoteID (params)" : For loggedin User only
+//^ Route 4: Deleting an existing Note: DEL endpoint "/api/notes/deleteNote/NoteID (params)" : For loggedin User only
 router.delete('/deleteNote/:id', fetchUser,
     async (req, res) => {
         try {
@@ -112,7 +112,7 @@ router.delete('/deleteNote/:id', fetchUser,
             if (!deletedNote) {
                 return res.status(400).json({ error: "Unable to delete the note" });
             }
-            res.json(deletedNote);
+            res.json({"Success":"Note has been deleted",note:deletedNote});
 
         } catch (err) {
             console.error(err.message);

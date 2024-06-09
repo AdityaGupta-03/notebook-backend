@@ -18,9 +18,9 @@ const fetchUser = require("../middleware/fetchUser");
 
 //^ Route 1: Creating user using POST: endpoint "/api/auth/createUser" : No Login required
 router.post('/createUser',
-    [   body('name', "Enter a valid Name").notEmpty(),
-        body('email', "Enter a valid Email").isEmail(),
-        body('password').isLength({ min: 5 })
+    [body('name', "Enter a valid Name").notEmpty(),
+    body('email', "Enter a valid Email").isEmail(),
+    body('password').isLength({ min: 5 })
     ],
     async (req, res) => {
         // Check for validation errors
@@ -100,7 +100,7 @@ router.post('/login',
 );
 
 //^ Route 3: Showing details of signedin User: POST endpoint "/api/auth/getUser" : Login Required
-router.post('/getUser', fetchUser, async (req, res) => {
+router.get('/getUser', fetchUser, async (req, res) => {
     // Check for validation errors
     const result = validationResult(req);
     if (!result.isEmpty()) {
