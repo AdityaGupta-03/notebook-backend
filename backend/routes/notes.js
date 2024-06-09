@@ -13,7 +13,7 @@ var jwt = require('jsonwebtoken');
 const fetchUser = require("../middleware/fetchUser");
 
 //^ Route 1: Fetching All Notes: GET endpoint "/api/notes/FetchNotes" : For loggedin User only
-router.post('/fetchNotes', fetchUser,
+router.get('/fetchNotes', fetchUser,
     async (req, res) => {
         try {
             let note = await Notes.find({ user: req.user.id });
@@ -31,7 +31,7 @@ router.post('/fetchNotes', fetchUser,
 );
 
 //^ Route 2: Submitting Note: POST endpoint "/api/notes/newNote" : For loggedin User only
-router.post('/newNote',
+router.post('/newNote', fetchUser,
     [
         // Validators in express-validator
         body('title', "Enter title").isLength({ min: 3 }),
@@ -49,7 +49,7 @@ router.post('/newNote',
 
             const savedNote = await note.save();
             res.json(savedNote);
-            
+
         } catch (err) {
             console.error(err.message);
             res.status(500).send("Error while Creating Note request");
