@@ -57,39 +57,39 @@ router.post('/newNote', fetchUser,
     }
 );
 
-//^ Route 3: Updating Notes: POST endpoint "/api/notes/updateNote" : For loggedin User only
-router.post('/updateNote',
-    [
-        body('email', "Enter a valid Email").isEmail(),
-        body('password').notEmpty()
-    ],
+//^ Route 3: Updating Notes: PUT endpoint "/api/notes/updateNote" : For loggedin User only
+router.put('/updateNote/:id', fetchUser,
     async (req, res) => {
-        // Check for validation errors
-        const result = validationResult(req);
-        if (!result.isEmpty()) {
-            return res.status(400).json({ result: result.array() });
-        }
-
-        // Checking if user has filled correct login credentials
         try {
-            // Check whether user email exists already or not
-            let user = await Users.findOne({ email: req.body.email });
-            if (!user) {
-                return res.status(400).json({ error: "Please try with correct login credentials" });
+            const {title,description,tag} = req.body;
+            const newNote={};
+
+            if(title){
+                newNote.title=title;
+            }
+            if(description){
+                newNote.description=description;
+            }
+            if(tag){
+                newNote.tag=tag;
             }
 
-            let pwdCompare = await bcrypt.compare(req.body.password, user.password);
-            if (!pwdCompare) {
-                return res.status(400).json({ error: "Please try with correct login credentials" });
+            const note = await Notes.findById(req.params.id);
+
+            if (!note) {
+                return res.status(404).send("Not Found");
+            }
+            if(note.user.toString() !== req.user.id){
+                return res.status(401).send("Not Allowed");
             }
 
-            const payload = {
-                id: user._id
+            const updatedNote = await Notes.findOneAndUpdate({ _id: req.params.id, user: req.user.id }, newNote, { new: true });
+            if (!updatedNote) {
+                return res.status(400).json({ error: "Notes are not present with the mentioned User" });
             }
 
-            let token = jwt.sign(payload, process.env.JWT_SECRET);
-            res.json({ token });
-
+            res.json(updatedNote);
+            
         } catch (err) {
             console.error(err.message);
             res.status(500).send("Error while login request");
@@ -99,36 +99,8 @@ router.post('/updateNote',
 
 //^ Route 4: Deleting Notes: POST endpoint "/api/notes/deleteNote" : For loggedin User only
 router.post('/deleteNote',
-    [
-        body('email', "Enter a valid Email").isEmail(),
-        body('password').notEmpty()
-    ],
     async (req, res) => {
-        // Check for validation errors
-        const result = validationResult(req);
-        if (!result.isEmpty()) {
-            return res.status(400).json({ result: result.array() });
-        }
-
-        // Checking if user has filled correct login credentials
         try {
-            // Check whether user email exists already or not
-            let user = await Users.findOne({ email: req.body.email });
-            if (!user) {
-                return res.status(400).json({ error: "Please try with correct login credentials" });
-            }
-
-            let pwdCompare = await bcrypt.compare(req.body.password, user.password);
-            if (!pwdCompare) {
-                return res.status(400).json({ error: "Please try with correct login credentials" });
-            }
-
-            const payload = {
-                id: user._id
-            }
-
-            let token = jwt.sign(payload, process.env.JWT_SECRET);
-            res.json({ token });
 
         } catch (err) {
             console.error(err.message);
