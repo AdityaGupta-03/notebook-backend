@@ -57,7 +57,7 @@ router.post('/newNote', fetchUser,
     }
 );
 
-//^ Route 3: Updating Notes: PUT endpoint "/api/notes/updateNote" : For loggedin User only
+//^ Route 3: Updating Notes: PUT endpoint "/api/notes/updateNote/NoteID (params)" : For loggedin User only
 router.put('/updateNote/:id', fetchUser,
     async (req, res) => {
         try {
@@ -85,14 +85,14 @@ router.put('/updateNote/:id', fetchUser,
 
             const updatedNote = await Notes.findOneAndUpdate({ _id: req.params.id, user: req.user.id }, newNote, { new: true });
             if (!updatedNote) {
-                return res.status(400).json({ error: "Notes are not present with the mentioned User" });
+                return res.status(400).json({ error: "Unable to update the note" });
             }
 
             res.json(updatedNote);
-            
+
         } catch (err) {
             console.error(err.message);
-            res.status(500).send("Error while login request");
+            res.status(500).send("Error while updating the note request");
         }
     }
 );
