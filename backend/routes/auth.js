@@ -15,6 +15,7 @@ var jwt = require('jsonwebtoken');
 // Fetching the user data by verifying the JSON Token
 const fetchUser = require("../middleware/fetchUser");
 
+require('dotenv').config({ path: '../.env.local' });
 
 //^ Route 1: Creating user using POST: endpoint "/api/auth/createUser" : No Login required
 router.post('/createUser',
