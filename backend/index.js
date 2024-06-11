@@ -1,10 +1,10 @@
+require('dotenv').config({ path: require('path').resolve(__dirname, './.env.local') });
+
 const mongoDB = require("./db");
 mongoDB();
 
 const express = require('express')
 const app = express()
-
-require('dotenv').config({ path: '.env.local' });
 
 // To view the request on body
 app.use(express.json());

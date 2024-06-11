@@ -11,11 +11,12 @@ const bcrypt = require('bcryptjs');
 
 // Json Web Tokento return the token when user gets created
 var jwt = require('jsonwebtoken');
+const secret = process.env.JWT_SECRET;
 
 // Fetching the user data by verifying the JSON Token
 const fetchUser = require("../middleware/fetchUser");
 
-require('dotenv').config({ path: '../.env.local' });
+
 
 //^ Route 1: Creating user using POST: endpoint "/api/auth/createUser" : No Login required
 router.post('/createUser',
@@ -50,7 +51,9 @@ router.post('/createUser',
                 id: user._id
             }
 
-            let token = jwt.sign(data, process.env.JWT_SECRET);
+            console.log('JWT_SECRET:', process.env.JWT_SECRET);
+
+            let token = jwt.sign(data, secret);
             res.json({ token });
 
         } catch (err) {
@@ -90,7 +93,9 @@ router.post('/login',
                 id: user._id
             }
 
-            let token = jwt.sign(payload, process.env.JWT_SECRET);
+            console.log('JWT_SECRET:', process.env.JWT_SECRET);
+            
+            let token = jwt.sign(payload, secret);
             res.json({ token });
 
         } catch (err) {
