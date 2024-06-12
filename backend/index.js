@@ -6,6 +6,11 @@ mongoDB();
 const express = require('express')
 const app = express()
 
+// Using CORS to allow frontend to post the Data on API
+var cors = require('cors')
+// Enabling Cors for all the Routes
+app.use(cors())
+
 // To view the request on body
 app.use(express.json());
 
